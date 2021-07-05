@@ -18,6 +18,8 @@ Each script and playbook have descriptions on what they do so they can be mainta
 
 Once the execution for the setup script is complete, `exit` your shell and relaunch your terminal. Changes should now be now visible.
 
+**NOTE**: In the home directory, the `~/.gitconfig` file has a git user section that needs to be updated with your git information if you plan on using git. Just replace the placeholders with your own information.
+
 
 ## Zsh with Prezto
 
@@ -55,6 +57,8 @@ A recursive pattern finder that works similarly to `grep`, but better.
 ### tldr
 
 The "too long; didn't read" alternative to `man` pages with usage examples.
+
+![tldr](./img/tldr.png)
 
 ### z
 
