@@ -1,8 +1,9 @@
 ################################################################################
 # Script      : zsh-setup.yml
 # Author      : David Velez
-# Date        : 11/04/2019
-# Description : Setup zsh from prezto framework
+# Date        : 07/04/2021
+# Description : Setup zsh shell environment from prezto framework and use my
+#               zsh config files
 ################################################################################
 
 - name: Verify Prezto Directory Existence

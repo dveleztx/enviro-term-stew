@@ -1,13 +1,13 @@
 ################################################################################
-# Script      : fury-config.yml
+# Script      : pref-config.yml
 # Author      : David Velez
-# Date        : 06/28/2019
-# Updated     : 06/23/2021
-# Description : This ansible script will setup my environment to install
-#              preferred packages that I use frequently
+# Date        : 07/05/2021
+# Description : These ansible tasks are called by the master script that sets
+#               up the environment to install preferred dev packages and CLI 
+#               tools that are handy
 ################################################################################
-# Tools       : Docker, Pip, Venv, Vagrant, VIM, and more...
-# Note        : This only works on Ubuntu 20.10+
+# Tools       : Git, Node, NPM, Pip, Venv, Vagrant, VIM, and more...
+# Note        : This only works on Pop OS/Ubuntu 20.04+
 ################################################################################
 
 - name: Install Preferred Packages
@@ -27,30 +27,38 @@
       - zsh
   become: yes
 
-- name: Install ripgrep (Ubuntu/Pop 20.10+)
+- name: Install bat, ripgrep, fd-find (Ubuntu/Pop 20.10+)
   apt:
     name: "{{ packages }}"
   vars:
     packages:
       - bat
+      - exa
       - ripgrep
       - fd-find
   become: yes
   when: ansible_distribution_version is version('20.10', 'ge')
 
-- name: Install ripgrep (pre Ubuntu/Pop 20.10)
+- name: Install fd-find (Ubuntu/Pop 20.04)
   apt:
-    name: ripgrep
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - fd-find
+  become: yes
+  when: ansible_distribution_version is version('20.04', 'eq')
+
+- name: Install bat, ripgrep with force-overwrite (Ubuntu/Pop 20.04)
+  apt:
+    name: "{{ packages }}"
     dpkg_options: 'force-overwrite'
+  vars:
+    packages:
+      - bat
+      - ripgrep
   become: yes
   ignore_errors: yes
   when: ansible_distribution_version is version('20.04', 'eq')
-
-- name: Install exa for ls highlighting (Ubuntu/Pop 20.10+)
-  apt:
-    name: exa
-  become: yes
-  when: ansible_distribution_version is version('20.10', 'ge')
 
 - name: Get latest exa package URI
   uri:

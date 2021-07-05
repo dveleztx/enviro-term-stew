@@ -12,7 +12,7 @@
 - hosts: localhost
 
   tasks:
-    - name: Run Personal Setup Playbook
+    - name: Run Preferences Setup Playbook
       import_tasks: ./pref-setup.yml
       vars:
         exa_uri: https://api.github.com/repos/ogham/exa/releases/latest
@@ -26,5 +26,5 @@
     - name: Run Zsh Setup Playbook
       import_tasks: ./zsh-setup.yml
       vars:
-        uid: userholder
+        uid: vagrant
 
