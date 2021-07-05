@@ -1,0 +1,42 @@
+################################################################################
+# Script      : git-clone-projects.yml
+# Author      : David Velez
+# Date        : 06/21/2021
+# Description : Git Clone my Favorite Projects
+################################################################################
+# Tools      : rupa/z
+################################################################################
+
+- name: Check is GitProjects Directory Exists
+  stat:
+    path: "{{ git_dir }}"
+  register: git_proj_dir
+
+- name: Create GitProjects Directory
+  file:
+    path: "{{ git_dir }}"
+    state: directory
+  when: git_proj_dir.stat.exists == False
+
+- name: Check is Rupa Z Directory Exists
+  stat:
+    path: "{{ z_dir }}"
+  register: z_proj_dir
+
+- name: Install Preferred Packages
+  git:
+    repo: https://github.com/rupa/z.git
+    dest: "{{ z_dir }}"
+  when: z_proj_dir.stat.exists == False
+
+- name: Make z.sh executable
+  file:
+    path: "{{ z_dir }}/z.sh"
+    mode: '0755'
+
+- name: Move z.sh to .local bin
+  file: 
+    src: "{{ z_dir }}/z.sh"
+    dest: ~/.local/bin/z.sh
+    state: link
+

@@ -1,0 +1,50 @@
+################################################################################
+# Script      : zsh-setup.yml
+# Author      : David Velez
+# Date        : 11/04/2019
+# Description : Setup zsh from prezto framework
+################################################################################
+
+- name: Verify Prezto Directory Existence
+  stat:
+    path: ~/.zprezto
+  register: prezto_dir
+
+- name: Git Clone Prezto 
+  git:
+    repo: https://github.com/sorin-ionescu/prezto.git
+    dest: ~/.zprezto
+    recursive: yes
+  when: prezto_dir.stat.exists == False
+    
+- name: Change shell to ZSH
+  user:
+    name: "{{ uid }}"
+    shell: /bin/zsh
+  become: yes
+
+- name: Zsh Configuration
+  shell: scripts/prezto-config.sh
+  args:
+    executable: /bin/zsh
+
+- name: Use template zshrc (20.04+)
+  template:
+    src: .zshrcvm
+    dest: ~/.zshrc
+    mode: '0740'
+  when: ansible_distribution_version is version('20.04', 'ge')
+
+- name: Use template zshrc (pre 20.04)
+  template:
+    src: .zshrcvm_prefocal
+    dest: ~/.zshrc
+    mode: '0740'
+  when: ansible_distribution_version is version('20.04', 'lt')
+
+- name: Use template zpreztorc
+  template:
+    src: .zpreztorc
+    dest: ~/.zpreztorc
+    mode: '0740'
+

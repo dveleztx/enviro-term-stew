@@ -1,0 +1,143 @@
+################################################################################
+# Script      : fury-config.yml
+# Author      : David Velez
+# Date        : 06/28/2019
+# Updated     : 06/23/2021
+# Description : This ansible script will setup my environment to install
+#              preferred packages that I use frequently
+################################################################################
+# Tools       : Docker, Pip, Venv, Vagrant, VIM, and more...
+# Note        : This only works on Ubuntu 20.10+
+################################################################################
+
+- name: Install Preferred Packages
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - git
+      - nodejs
+      - npm
+      - python3-pip
+      - python3-dev
+      - python3-venv
+      - tree
+      - vagrant
+      - vim
+      - zsh
+  become: yes
+
+- name: Install ripgrep (Ubuntu/Pop 20.10+)
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - bat
+      - ripgrep
+      - fd-find
+  become: yes
+  when: ansible_distribution_version is version('20.10', 'ge')
+
+- name: Install ripgrep (pre Ubuntu/Pop 20.10)
+  apt:
+    name: ripgrep
+    dpkg_options: 'force-overwrite'
+  become: yes
+  ignore_errors: yes
+  when: ansible_distribution_version is version('20.04', 'eq')
+
+- name: Install exa for ls highlighting (Ubuntu/Pop 20.10+)
+  apt:
+    name: exa
+  become: yes
+  when: ansible_distribution_version is version('20.10', 'ge')
+
+- name: Get latest exa package URI
+  uri:
+    url: "{{ exa_uri }}"
+    return_content: true
+  register: exa_latest
+  ignore_unreachable: yes
+  when: ansible_distribution_version is version('20.10', 'lt')
+
+- name: Check Downloads Folder Existence
+  stat:
+    path: ~/Downloads
+  register: dl_dir
+
+- name: Create Downloads Folder if Non-Existence
+  file:
+    path: ~/Downloads
+    state: directory
+    mode: '0755'
+  when: dl_dir.stat.exists == False
+
+- name: Get exa package from repo
+  get_url:
+    url: "{{ exa_latest.json.assets.3.browser_download_url }}"
+    dest: "~/Downloads/exa.zip"
+  ignore_unreachable: yes
+  when: ansible_distribution_version is version('20.10', 'lt')
+
+- name: Verify exa package download
+  stat:
+    path: "~/Downloads/exa.zip"
+  register: exa_package
+  when: ansible_distribution_version is version('20.10', 'lt')
+
+- name: Unzip exa package
+  unarchive:
+    src: "~/Downloads/exa.zip"
+    dest: "~/Downloads"
+  ignore_errors: yes
+  when: ansible_distribution_version is version('20.10', 'lt') and exa_package.stat.exists == True
+
+- name: Make exa binary executable
+  copy:
+    src: "~/Downloads/bin/exa"
+    dest: /usr/bin/exa
+    mode: '0755'
+  become: yes
+  when: ansible_distribution_version is version('20.10', 'lt')
+
+- name: Install Preferred NPM Packages
+  npm:
+    name: "{{ item }}"
+    global: yes
+  with_items:
+      - tldr
+      - diff-so-fancy
+  become: yes
+  when: ansible_distribution_version is version('20.04', 'ge')
+
+- name: Check if Local Bin Exists
+  stat:
+    path: ~/.local/bin/
+  register: local_bin_dir
+
+- name: Create Local Bin Directory
+  file:
+    path: ~/.local/bin
+    state: directory
+  when: local_bin_dir.stat.exists == False
+
+- name: Configure Git Defaults
+  template:
+    src: .gitconfig
+    dest: ~/.gitconfig
+    mode: '0664'
+
+- name: Create symbolic link for fdfind to fd
+  file:
+    src: /usr/bin/fdfind
+    dest: ~/.local/bin/fd
+    state: link
+  when: ansible_distribution_version is version('20.04', 'ge')
+
+- name: Create symbolic link for batcat to cat
+  file:
+    src: /usr/bin/batcat
+    dest: ~/.local/bin/bat
+    state: link
+  when: ansible_distribution_version is version('20.04', 'ge')
+

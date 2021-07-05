@@ -1,0 +1,30 @@
+################################################################################
+# Script      : master.yml
+# Author      : David Velez
+# Date        : 07/04/2021
+# Description : Master Ansible Playbook
+################################################################################
+---
+# Run with ansible-playbook <filename> -u root
+#       (make sure to add the IPs of machines you want to manage to /etc/ansible/hosts first)
+#
+
+- hosts: localhost
+
+  tasks:
+    - name: Run Personal Setup Playbook
+      import_tasks: ./pref-setup.yml
+      vars:
+        exa_uri: https://api.github.com/repos/ogham/exa/releases/latest
+
+    - name: Run Git Projects Playbook
+      import_tasks: ./git-clone-projects.yml
+      vars:
+        git_dir: "~/GitProjects"
+        z_dir: "~/GitProjects/z"
+
+    - name: Run Zsh Setup Playbook
+      import_tasks: ./zsh-setup.yml
+      vars:
+        uid: userholder
+
