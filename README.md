@@ -6,6 +6,8 @@
 
 This stew is designed to work with Ubuntu and Pop OS 20.04 and above. Many packages are not available pre-focal. Anything before that needs to be conditioned to work with your environment using something like snap packages. Possible update in the future.
 
+**Note for users with pre-existing .zshrc files**: If you already have a pre-existing .zshrc file, it would be a good idea to look in the ./playbooks/templates directory and update .zshrcvm if you are using Ubuntu/Pop 20.04 and above, or .zshrcvm_prefocal for previous versions. Update as needed for your environment in these cases.
+
 ### Automated Setup
 
 This setup is relatively easy and straight forward, but running the **setup.sh** script will do all the legwork with no issues.
@@ -30,9 +32,16 @@ Prezto is a great framework for Zsh, including command completion, globbing, git
 
 When you are back in your terminal shell environment, you will see that you are using z-shell (zsh). Some of the tools that are installed can come pretty handy. Here are some examples:
 
+### bat
+
+A better way to read files using `bat` with syntax-highlighting. Acts like `less` if the contents doesn't fit unto the screen.
+
+![bat](./img/bat.png)
+
+
 ### exa
 
-*The ls syntax highlighting library*
+An `ls` syntax highlighting library
 
 ![exa](./img/exa.png)
 
