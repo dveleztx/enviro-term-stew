@@ -24,24 +24,37 @@
     shell: /bin/zsh
   become: yes
 
+- name: Check if zshrc already exists
+  stat:
+    path: ~/.zshrc
+  register: zshrc_file
+
+- name: Update Existing Zshrc
+  blockinfile:
+    block: "{{ lookup('file', './templates/.zshrcvm') }}"
+    path: ~/.zshrc
+    backup: yes
+  when: zshrc_file.stat.exists == True
+
 - name: Zsh Configuration
   shell: scripts/prezto-config.sh
   args:
     executable: /bin/zsh
+  when: zshrc_file.stat.exists == False
 
 - name: Use template zshrc (20.04+)
   template:
     src: .zshrcvm
     dest: ~/.zshrc
     mode: '0740'
-  when: ansible_distribution_version is version('20.04', 'ge')
+  when: ansible_distribution_version is version('20.04', 'ge') and zshrc_file.stat.exists == False
 
 - name: Use template zshrc (pre 20.04)
   template:
     src: .zshrcvm_prefocal
     dest: ~/.zshrc
     mode: '0740'
-  when: ansible_distribution_version is version('20.04', 'lt')
+  when: ansible_distribution_version is version('20.04', 'lt') and zshrc_file.stat.exists == False
 
 - name: Use template zpreztorc
   template:
